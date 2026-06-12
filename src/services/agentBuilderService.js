@@ -1,5 +1,6 @@
 // src/services/agentBuilderService.js
 const axios = require('axios');
+const config = require('../config/environment');
 
 /**
  * Creates a complete Elevenlabs agent configuration with all required
@@ -61,14 +62,18 @@ async function createAgentConfig(options) {
         silence_end_call_timeout: 20.0,  
         mode: "turn"
       },
+      // The live Conversational AI agent always speaks with ElevenLabs (ConvAI
+      // cannot use third-party voices such as 60db). These defaults are now
+      // sourced from config so the voice/model can be tuned via env vars and
+      // stay consistent with the standalone /api/tts ElevenLabs provider.
       tts: {
-        model_id: "eleven_flash_v2",
-        voice_id: "cgSgspJ2msm6clMCkdW9", 
+        model_id: config.elevenlabs.modelId,
+        voice_id: config.elevenlabs.voiceId,
         agent_output_audio_format: "pcm_16000",
         optimize_streaming_latency: 3,
-        stability: 0.5,
-        speed: 1.0,
-        similarity_boost: 0.8,
+        stability: config.elevenlabs.stability,
+        speed: config.elevenlabs.speed,
+        similarity_boost: config.elevenlabs.similarityBoost,
         pronunciation_dictionary_locators: []
       },
       conversation: {
