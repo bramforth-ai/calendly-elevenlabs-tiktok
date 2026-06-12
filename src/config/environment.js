@@ -17,6 +17,11 @@ const optionalGroups = {
         condition: true, // Voice agent functionality
         vars: ['ELEVENLABS_API_KEY']
     },
+    sixtydb: {
+        // Only required when 60db is selected as the active TTS provider
+        condition: process.env.TTS_PROVIDER === 'sixtydb',
+        vars: ['SIXTYDB_API_KEY']
+    },
     github: {
         condition: true, // Prompt editing
         vars: ['GITHUB_TOKEN', 'GITHUB_REPO_OWNER', 'GITHUB_REPO_NAME']
@@ -61,9 +66,38 @@ module.exports = {
         userUuid: process.env.CALENDLY_USER_UUID
     },
 
+    // TTS provider selection (shared by the src/services/tts abstraction)
+    // Note: this only affects server-side speech synthesis via POST /api/tts.
+    // The live ElevenLabs Conversational AI agent always speaks with ElevenLabs.
+    tts: {
+        provider: (process.env.TTS_PROVIDER || 'elevenlabs').toLowerCase(),
+        // Default container format for providers that accept one (60db: mp3|wav|ogg|flac)
+        defaultFormat: (process.env.TTS_OUTPUT_FORMAT || 'mp3').toLowerCase()
+    },
+
     // Elevenlabs config
     elevenlabs: {
-        apiKey: process.env.ELEVENLABS_API_KEY
+        apiKey: process.env.ELEVENLABS_API_KEY,
+        baseUrl: process.env.ELEVENLABS_BASE_URL || 'https://api.elevenlabs.io',
+        // Voice/model used both by the ConvAI agent builder and the /api/tts module.
+        // Ranges here are ElevenLabs-native (stability/similarity 0-1).
+        voiceId: process.env.ELEVENLABS_VOICE_ID || 'cgSgspJ2msm6clMCkdW9',
+        modelId: process.env.ELEVENLABS_MODEL_ID || 'eleven_flash_v2',
+        outputFormat: process.env.ELEVENLABS_OUTPUT_FORMAT || 'mp3_44100_128',
+        stability: process.env.ELEVENLABS_STABILITY !== undefined
+            ? parseFloat(process.env.ELEVENLABS_STABILITY) : 0.5,
+        speed: process.env.ELEVENLABS_SPEED !== undefined
+            ? parseFloat(process.env.ELEVENLABS_SPEED) : 1.0,
+        similarityBoost: process.env.ELEVENLABS_SIMILARITY_BOOST !== undefined
+            ? parseFloat(process.env.ELEVENLABS_SIMILARITY_BOOST) : 0.8
+    },
+
+    // 60db (sixtydb) TTS config — used by the src/services/tts abstraction.
+    // Ranges here are 60db-native (speed 0.5-2.0, stability/similarity 0-100).
+    sixtydb: {
+        apiKey: process.env.SIXTYDB_API_KEY,
+        baseUrl: process.env.SIXTYDB_BASE_URL || 'https://api.60db.ai',
+        voiceId: process.env.SIXTYDB_VOICE_ID || 'fbb75ed2-975a-40c7-9e06-38e30524a9a1'
     },
 
     // GitHub config

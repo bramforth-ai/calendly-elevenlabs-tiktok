@@ -10,6 +10,7 @@ const calendlyRoutes = require('./routes/calendly');
 const notificationsRoutes = require('./routes/notifications');
 const elevenlabsRoutes = require('./routes/elevenlabs');
 const promptBuilderRoutes = require('./routes/promptBuilder');
+const ttsRoutes = require('./routes/tts');
 
 // Import authentication middleware
 const auth = require('./middleware/auth');
@@ -109,6 +110,7 @@ app.use('/api/calendly', calendlyRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/elevenlabs', elevenlabsRoutes);
 app.use('/api/prompt-builder', promptBuilderRoutes);
+app.use('/api/tts', ttsRoutes);
 
 // Global error handler
 app.use((err, req, res, next) => {
